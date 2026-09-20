@@ -1,0 +1,14 @@
+# Environment & Secret files
+.env
+backend/.env
+*.env
+
+# Dependencies
+vendor/
+backend/vendor/
+node_modules/
+
+# Logs & Temporary Files
+*.log
+.system_generated/
+scratch/
