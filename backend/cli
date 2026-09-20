@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+/**
+ * Antigravity ERP - CLI Tool
+ * Usage:
+ *   php cli migrate
+ */
+
+require_once __DIR__ . '/src/autoload.php';
+require_once __DIR__ . '/database/MigrationRunner.php';
+
+use App\Core\Env;
+use Database\MigrationRunner;
+
+// Load environment variables
+Env::load(__DIR__ . '/.env');
+
+$command = $argv[1] ?? 'help';
+
+switch ($command) {
+    case 'migrate':
+        $migrationsDir = __DIR__ . '/database/migrations';
+        $runner = new MigrationRunner($migrationsDir);
+        $runner->migrate();
+        break;
+
+    case 'help':
+    default:
+        echo "Antigravity ERP CLI Tool\n";
+        echo "Available commands:\n";
+        echo "  php cli migrate    Run pending database migrations\n";
+        break;
+}
