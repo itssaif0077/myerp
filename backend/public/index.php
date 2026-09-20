@@ -51,6 +51,10 @@ $container->bind(
     \App\Domain\Repositories\IProductRepository::class,
     \App\Infrastructure\Persistence\ProductRepository::class
 );
+$container->bind(
+    \App\Domain\Repositories\IContactRepository::class,
+    \App\Infrastructure\Persistence\ContactRepository::class
+);
 
 // 6. Setup Router & Middleware
 $router = $container->make(Router::class);
@@ -64,6 +68,8 @@ $router->get('/api/v1', function (Request $request) {
         'status'  => 'online',
         'endpoints' => [
             'health'       => 'GET /api/v1/health',
+            'auth_login'   => 'POST /api/v1/auth/login',
+            'contacts'     => 'GET|POST /api/v1/contacts',
             'pos_products' => 'GET /api/v1/pos/products',
             'pos_sale'     => 'POST /api/v1/pos/sale',
         ]
@@ -75,9 +81,16 @@ $router->get('/api/v1/health', [HealthController::class, 'check']);
 // Authentication Routes (Get JWT Token)
 $router->post('/api/v1/auth/login', [\App\Controllers\AuthController::class, 'login']);
 
-// POS Quick-Sell Endpoints (Vadapav ₹20, instant print, atomic stock & ledger)
-$router->get('/api/v1/pos/products', [\App\Controllers\PosController::class, 'getQuickProducts']);
-$router->post('/api/v1/pos/sale', [\App\Controllers\PosController::class, 'createQuickSale']);
+// Contacts CRUD (Customers, Suppliers, Karigars, Staff - Protected by JWT)
+$router->get('/api/v1/contacts', [\App\Controllers\ContactController::class, 'index'], [JwtAuthMiddleware::class]);
+$router->get('/api/v1/contacts/{id}', [\App\Controllers\ContactController::class, 'show'], [JwtAuthMiddleware::class]);
+$router->post('/api/v1/contacts', [\App\Controllers\ContactController::class, 'store'], [JwtAuthMiddleware::class]);
+$router->put('/api/v1/contacts/{id}', [\App\Controllers\ContactController::class, 'update'], [JwtAuthMiddleware::class]);
+$router->delete('/api/v1/contacts/{id}', [\App\Controllers\ContactController::class, 'destroy'], [JwtAuthMiddleware::class]);
+
+// POS Quick-Sell Endpoints (Protected by JWT)
+$router->get('/api/v1/pos/products', [\App\Controllers\PosController::class, 'getQuickProducts'], [JwtAuthMiddleware::class]);
+$router->post('/api/v1/pos/sale', [\App\Controllers\PosController::class, 'createQuickSale'], [JwtAuthMiddleware::class]);
 
 
 // Example protected route testing JWT

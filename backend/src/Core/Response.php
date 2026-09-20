@@ -57,6 +57,11 @@ class Response
         self::json(null, 403, $message, false);
     }
 
+    public static function conflict(string $message = 'Conflict', mixed $data = null): void
+    {
+        self::json($data, 409, $message, false);
+    }
+
     public static function notFound(string $message = 'Resource not found'): void
     {
         self::json(null, 404, $message, false);

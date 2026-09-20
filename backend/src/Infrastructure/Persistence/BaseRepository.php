@@ -79,6 +79,10 @@ abstract class BaseRepository
 
     public function update(int $id, array $data): bool
     {
+        if (empty($data)) {
+            return true;
+        }
+
         $setClauses = [];
         foreach (array_keys($data) as $column) {
             $setClauses[] = "`{$column}` = :{$column}";

@@ -52,20 +52,17 @@ class Request
 
     private function parseBody(): array
     {
-        if (in_array($this->method, ['POST', 'PUT', 'PATCH', 'DELETE'])) {
-            $contentType = $this->getHeader('content-type') ?? '';
-            
-            if (str_contains($contentType, 'application/json')) {
-                $rawInput = file_get_contents('php://input');
-                if ($rawInput) {
-                    $decoded = json_decode($rawInput, true);
-                    return is_array($decoded) ? $decoded : [];
-                }
-            } else {
-                return $_POST;
+        $contentType = $this->getHeader('content-type') ?? '';
+        
+        if (str_contains($contentType, 'application/json')) {
+            $rawInput = file_get_contents('php://input');
+            if ($rawInput) {
+                $decoded = json_decode($rawInput, true);
+                return is_array($decoded) ? $decoded : [];
             }
         }
-        return [];
+
+        return $_POST;
     }
 
     public function getMethod(): string
